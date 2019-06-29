@@ -1,5 +1,6 @@
 require_relative "../config/environment.rb"
 require 'active_support/inflector'
+require 'pry'
 
 class InteractiveRecord
    def self.table_name
@@ -20,17 +21,22 @@ class InteractiveRecord
    end
 
    def initialize(options={})
-      options.each do |property,value|
-        self.send("#{property}=", value)
+      options.each do |property, value|
+         self.send("#{property}=", value)
       end
     end
   
     def table_name_for_insert
-      self.class.table_name
+      table_name = self.class.table_name
+      table_name
+      # binding.pry
     end
   
     def col_names_for_insert
-      self.class.column_names.delete_if {|col| col == "id"}.join(", ")
+      #need to delete the id cloumn from the returned array in the table_name_for_insert method
+      result = self.class.column_names.delete_if {|column| column == 'id'}.join(", ")
+      result
+      # binding.pry
     end
   
     def values_for_insert
@@ -39,6 +45,7 @@ class InteractiveRecord
         values << "'#{send(col_name)}'" unless send(col_name).nil?
       end
       values.join(", ")
+      # binding.pry
     end
   
     def save
@@ -48,7 +55,7 @@ class InteractiveRecord
     end
   
     def self.find_by_name(name)
-      sql = "SELECT * FROM #{self.table_name} WHERE name='#{name}'"
+      sql = "SELECT * FROM #{self.table_name} WHERE name = '#{name}' "
       DB[:conn].execute(sql)
     end
   
